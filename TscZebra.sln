@@ -1,0 +1,32 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Clients", "Clients", "{8B6C662D-3957-40CE-AE14-3C48843BE166}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{1A225FE7-BEEF-4155-B1DA-3F4960C8236B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Nugets", "Nugets", "{C59BBDCB-62AB-440F-8BAF-3167E687212D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TscZebra.Plugin", "Nugets\TscZebra.Plugin\TscZebra.Plugin.csproj", "{F7E5795D-E4C0-4434-8EA3-7E11EF18D229}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TscZebra.Plugin.Abstractions", "Nugets\TscZebra.Plugin.Abstractions\TscZebra.Plugin.Abstractions.csproj", "{185BDC8D-CB48-4011-A41D-2BC6B39F26F3}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{F7E5795D-E4C0-4434-8EA3-7E11EF18D229}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F7E5795D-E4C0-4434-8EA3-7E11EF18D229}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F7E5795D-E4C0-4434-8EA3-7E11EF18D229}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F7E5795D-E4C0-4434-8EA3-7E11EF18D229}.Release|Any CPU.Build.0 = Release|Any CPU
+		{185BDC8D-CB48-4011-A41D-2BC6B39F26F3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{185BDC8D-CB48-4011-A41D-2BC6B39F26F3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{185BDC8D-CB48-4011-A41D-2BC6B39F26F3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{185BDC8D-CB48-4011-A41D-2BC6B39F26F3}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{F7E5795D-E4C0-4434-8EA3-7E11EF18D229} = {C59BBDCB-62AB-440F-8BAF-3167E687212D}
+		{185BDC8D-CB48-4011-A41D-2BC6B39F26F3} = {C59BBDCB-62AB-440F-8BAF-3167E687212D}
+	EndGlobalSection
+EndGlobal
