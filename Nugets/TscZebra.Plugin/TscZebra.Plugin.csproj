@@ -9,8 +9,4 @@
         <ProjectReference Include="..\TscZebra.Plugin.Abstractions\TscZebra.Plugin.Abstractions.csproj" />
     </ItemGroup>
 
-    <ItemGroup>
-      <Folder Include="Common\" />
-    </ItemGroup>
-
 </Project>

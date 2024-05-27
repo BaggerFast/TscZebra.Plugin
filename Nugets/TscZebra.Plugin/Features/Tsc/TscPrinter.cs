@@ -2,4 +2,4 @@
 
 namespace TscZebra.Plugin.Features.Tsc;
 
-internal class TscPrinter(IPAddress ip, int port) : PrinterBase(ip, port);
+internal sealed class TscPrinter(IPAddress ip, int port) : PrinterBase(ip, port);
