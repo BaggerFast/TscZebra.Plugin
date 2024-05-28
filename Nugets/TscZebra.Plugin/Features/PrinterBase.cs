@@ -1,12 +1,17 @@
 ﻿using System;
+using System.IO;
 using System.Net;
 using System.Net.Sockets;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Messaging;
 using TscZebra.Plugin.Abstractions.Common;
 using TscZebra.Plugin.Abstractions.Enums;
+using TscZebra.Plugin.Abstractions.Exceptions;
+using TscZebra.Plugin.Common;
 using TscZebra.Plugin.Messages;
+using TscZebra.Plugin.Validators.State;
 
 namespace TscZebra.Plugin.Features;
 
@@ -14,7 +19,7 @@ internal abstract class PrinterBase(IPAddress ip, int port) : IZplPrinter
 {
     private Timer? StatusTimer { get; set; }
     protected TcpClient TcpClient { get; private set; } = new();
-    protected PrinterStatuses Status { get; private set; } = PrinterStatuses.IsDisconnected;
+    protected PrinterStatuses Status { get; set; } = PrinterStatuses.IsDisconnected;
 
     #region Public
     
@@ -22,10 +27,18 @@ internal abstract class PrinterBase(IPAddress ip, int port) : IZplPrinter
 
     public async Task ConnectAsync()
     {
-        TcpClient.Dispose();
-        TcpClient = new() { ReceiveTimeout = 200 };
-        await TcpClient.ConnectAsync(ip, port).WaitAsync(TimeSpan.FromMilliseconds(100));
-        SetStatus(PrinterStatuses.Ready);
+        try
+        {
+            Disconnect();
+            TcpClient = new() { ReceiveTimeout = 200 };
+            await TcpClient.ConnectAsync(ip, port).WaitAsync(TimeSpan.FromMilliseconds(100));
+            SetStatus(PrinterStatuses.Ready);
+        }
+        catch
+        {
+            Disconnect();
+            throw new PrinterConnectionException();
+        }
     }
 
     public void Disconnect()
@@ -46,7 +59,22 @@ internal abstract class PrinterBase(IPAddress ip, int port) : IZplPrinter
         StatusTimer = new(Callback, null, TimeSpan.Zero, interval);
         return;
 
-        async void Callback(object? _) => await RequestStatusAsync();
+        async void Callback(object? _)
+        {
+            try
+            {
+                if (Status == PrinterStatuses.IsDisconnected)
+                {
+                    StopStatusPolling();
+                    return;
+                }
+                await RequestStatusAsync();
+            }
+            catch
+            {
+                StopStatusPolling();
+            }
+        }
     }
 
     public void StopStatusPolling()
@@ -60,6 +88,27 @@ internal abstract class PrinterBase(IPAddress ip, int port) : IZplPrinter
     #region Commands
 
     public abstract Task<PrinterStatuses> RequestStatusAsync();
+    
+    public async Task PrintZplAsync(string zpl)
+    {
+        if (!new IsPrinterPrintReady().Validate(Status))
+            throw new PrinterStatusException();
+        
+        if (!zpl.StartsWith("^XA") || !zpl.EndsWith("^XZ"))
+            throw new PrinterCommandBodyException();
+
+        try
+        {    
+            Stream stream = TcpClient.GetStream();
+            byte[] commandBytes = Encoding.UTF8.GetBytes(zpl);
+            await stream.WriteAsync(commandBytes);
+        }
+        catch
+        {
+            Disconnect();
+            throw new PrinterConnectionException();
+        }
+    }
 
     #endregion
     
@@ -75,19 +124,20 @@ internal abstract class PrinterBase(IPAddress ip, int port) : IZplPrinter
         WeakReferenceMessenger.Default.Send(new PrinterStatusMsg(Status));
     }
     
-    // protected async Task<TResult?> ExecuteCmd<TResult>(Func<Task<TResult>> command) where TResult : class
-    // {
-    //     if (Status is PrinterStatuses.IsDisconnected) return null;
-    //     
-    //     try
-    //     {
-    //         await command();
-    //     }
-    //     catch (Exception)
-    //     {
-    //         SetStatus(Prit.IsForceDisconnected);
-    //     }
-    // }
+    protected async Task<T> ExecuteCommand<T>(BaseCommand<T> command, BaseValidator<PrinterStatuses> stateValidator)
+    {
+        if (!stateValidator.Validate(Status))
+            throw new PrinterStatusException();
+        try
+        {
+            return await command.RequestAsync(TcpClient.GetStream());
+        }
+        catch (Exception)
+        {
+            Disconnect();
+            throw new PrinterConnectionException();
+        }
+    }
 
     
     #endregion

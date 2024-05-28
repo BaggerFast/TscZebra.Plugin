@@ -12,5 +12,6 @@ public abstract class BaseCommand<T> (string command)
         await stream.WriteAsync(commandBytes);
         return await ResponseAsync(stream);
     }
+    
     protected abstract Task<T> ResponseAsync(NetworkStream stream);
 }

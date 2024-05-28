@@ -4,6 +4,7 @@
 @using TscZebra.Plugin
 @using TscZebra.Plugin.Abstractions.Common
 @using TscZebra.Plugin.Abstractions.Enums
+@using TscZebra.Plugin.Abstractions.Exceptions
 @using TscZebra.Plugin.Messages
 
 @implements CommunityToolkit.Mvvm.Messaging.IRecipient<TscZebra.Plugin.Messages.PrinterStatusMsg>
@@ -13,7 +14,7 @@
   <Button OnClick="@Connect">
     Connect
   </Button>
-  <Button OnClick="@Printer.Disconnect">
+  <Button OnClick="@Disconnect">
     Disconnect
   </Button>
   <Button OnClick="@GetStatus">
@@ -34,17 +35,40 @@
   IZplPrinter Printer { get; set; } = PrinterFactory.Create(IPAddress.Parse("10.0.22.71"), 9100, PrinterTypes.Tsc);
   PrinterStatuses Status { get; set; }= PrinterStatuses.IsDisconnected;
   PrinterStatuses StatusByHand { get; set; }= PrinterStatuses.IsDisconnected;
-  
+
+  protected override void OnAfterRender(bool firstRender)
+  {
+    if (firstRender) WeakReferenceMessenger.Default.Register(this);
+    base.OnAfterRender(firstRender);
+  }
+
   private async Task Connect()
   {
-    await Printer.ConnectAsync();
-    Printer.StartStatusPolling(5);
-    WeakReferenceMessenger.Default.Register(this);
+    try
+    {
+      await Printer.ConnectAsync();
+      Printer.StartStatusPolling(5);
+    } catch (PrinterConnectionException)
+    {
+      
+    } 
   }
+  
+  private void Disconnect()
+  { 
+    Printer.Disconnect();
+  }
+
 
   private async Task GetStatus()
   {
-    StatusByHand = await Printer.RequestStatusAsync();
+    try
+    {
+      StatusByHand = await Printer.RequestStatusAsync();
+    } catch (PrinterConnectionException)
+    {
+      
+    } 
   }
 
   public void Receive(PrinterStatusMsg message)
