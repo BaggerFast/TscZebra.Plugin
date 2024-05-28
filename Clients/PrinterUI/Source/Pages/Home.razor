@@ -1,0 +1,61 @@
+﻿@page "/"
+@using System.Net
+@using CommunityToolkit.Mvvm.Messaging
+@using TscZebra.Plugin
+@using TscZebra.Plugin.Abstractions.Common
+@using TscZebra.Plugin.Abstractions.Enums
+@using TscZebra.Plugin.Messages
+
+@implements CommunityToolkit.Mvvm.Messaging.IRecipient<TscZebra.Plugin.Messages.PrinterStatusMsg>
+@implements IDisposable
+
+<div class="w-full flex gap-2 pt-2 items-center justify-center">
+  <Button OnClick="@Connect">
+    Connect
+  </Button>
+  <Button OnClick="@Printer.Disconnect">
+    Disconnect
+  </Button>
+  <Button OnClick="@GetStatus">
+    GetStatusByHand
+  </Button>
+  <Button>
+    Print
+  </Button>
+</div>
+<div class="w-full pt-4 flex flex-col items-center justify-center">
+  <p class="text-2xl">StatusByEvent = @Status</p>
+  <p class="text-2xl">StatusByHande = @StatusByHand</p>
+</div>
+
+
+
+@code {
+  IZplPrinter Printer { get; set; } = PrinterFactory.Create(IPAddress.Parse("10.0.22.71"), 9100, PrinterTypes.Tsc);
+  PrinterStatuses Status { get; set; }= PrinterStatuses.IsDisconnected;
+  PrinterStatuses StatusByHand { get; set; }= PrinterStatuses.IsDisconnected;
+  
+  private async Task Connect()
+  {
+    await Printer.ConnectAsync();
+    Printer.StartStatusPolling(5);
+    WeakReferenceMessenger.Default.Register(this);
+  }
+
+  private async Task GetStatus()
+  {
+    StatusByHand = await Printer.RequestStatusAsync();
+  }
+
+  public void Receive(PrinterStatusMsg message)
+  {
+      Status = message.Status;
+      InvokeAsync(StateHasChanged);
+  }
+
+  public void Dispose()
+  {
+    Printer.Dispose();
+    WeakReferenceMessenger.Default.Unregister<PrinterStatusMsg>(this);
+  }
+}

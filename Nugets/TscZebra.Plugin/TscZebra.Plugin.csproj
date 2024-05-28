@@ -2,11 +2,16 @@
 
     <PropertyGroup>
         <TargetFramework>net8.0</TargetFramework>
+        <Nullable>enable</Nullable>
         <LangVersion>12</LangVersion>
     </PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\TscZebra.Plugin.Abstractions\TscZebra.Plugin.Abstractions.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="CommunityToolkit.Mvvm" Version="8.2.2" />
     </ItemGroup>
 
 </Project>

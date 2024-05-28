@@ -2,14 +2,13 @@
 
 public enum PrinterStatuses
 {
-    IsDisabled,
-    IsForceDisconnected,
-    Unknown,
+    Unsupported,
     Paused,
     Ready,
     HeadOpen,
     PaperOut,
     PaperJam,
     Busy,
-    RibbonOut
+    RibbonOut,
+    IsDisconnected,
 }
