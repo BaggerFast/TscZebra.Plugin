@@ -26,10 +26,8 @@ jobs:
           
       - name: Setup Node
         uses: actions/setup-node@v4
-        working-directory: Docs
         with:
           node-version: 20
-          cache: npm
           
       - name: Setup Pages
         uses: actions/configure-pages@v4
