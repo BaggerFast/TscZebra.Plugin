@@ -9,8 +9,8 @@ using CommunityToolkit.Mvvm.Messaging;
 using TscZebra.Plugin.Abstractions.Common;
 using TscZebra.Plugin.Abstractions.Enums;
 using TscZebra.Plugin.Abstractions.Exceptions;
+using TscZebra.Plugin.Abstractions.Messages;
 using TscZebra.Plugin.Common;
-using TscZebra.Plugin.Messages;
 using TscZebra.Plugin.Validators.State;
 
 namespace TscZebra.Plugin.Features;
@@ -31,8 +31,19 @@ internal abstract class PrinterBase(IPAddress ip, int port) : IZplPrinter
         {
             Disconnect();
             TcpClient = new() { ReceiveTimeout = 200 };
-            await TcpClient.ConnectAsync(ip, port).WaitAsync(TimeSpan.FromMilliseconds(100));
-            SetStatus(PrinterStatuses.Ready);
+
+            Task connectTask = TcpClient.ConnectAsync(ip, port);
+            Task timeoutTask = Task.Delay(200);
+
+            if (await Task.WhenAny(connectTask, timeoutTask) == timeoutTask)
+            {
+                connectTask.Dispose();
+                throw new PrinterConnectionException();
+            }
+            
+            await connectTask;
+            Status = PrinterStatuses.Ready;
+            await RequestStatusAsync();
         }
         catch
         {

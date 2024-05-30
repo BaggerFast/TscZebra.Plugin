@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- https://learn.microsoft.com/en-us/cpp/build/reference/common-macros-for-build-commands-and-properties -->
+<Project>
+    <Target Name="Optimize" BeforeTargets="Link">
+        <Message Text="Optimizing"/>
+    </Target>
+    <Target Name="BeforeBuild">
+        <!-- Insert tasks to run before build here -->
+    </Target>
+    <Target Name="AfterBuild">
+        <!-- Insert tasks to run after build here -->
+    </Target>
+    <!-- Uncomment this for clean -->
+    <!--<Target Name="ClearObj" BeforeTargets="Clean">
+        <RemoveDir Directories="./obj" />
+    </Target>-->
+    <Target Name="ClearBin" BeforeTargets="Clean">
+        <RemoveDir Directories="./bin"/>
+    </Target>
+</Project>

@@ -1,6 +1,6 @@
 using TscZebra.Plugin.Abstractions.Enums;
 
-namespace TscZebra.Plugin.Messages;
+namespace TscZebra.Plugin.Abstractions.Messages;
 
 public class PrinterStatusMsg(PrinterStatuses status)
 {

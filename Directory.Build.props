@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project>
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <Deterministic>true</Deterministic>
+        <WarningLevel>9999</WarningLevel>
+        <Prefer32Bit>false</Prefer32Bit>
+        <LangVersion>12</LangVersion>
+        <Nullable>enable</Nullable>
+        <ImplicitUsings>enable</ImplicitUsings>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <Description>C# nuget package for zpl 2 printers (Zebra and TSC)</Description>
+        <PackageProjectUrl>https://vladstandard.github.io/TscZebra.Plugin/</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/VladStandard/TscZebra.Plugin</RepositoryUrl>
+        <RepositoryType>GitHub</RepositoryType>
+        <PackageTags>Printer;Tsk;Zebra</PackageTags>
+    </PropertyGroup>
+    
+</Project>
