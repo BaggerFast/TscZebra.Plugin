@@ -1,8 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
     
+    <PropertyGroup>
+        <Description>C# nuget package for zpl printers (Zebra and TSC)</Description>
+    </PropertyGroup>
+    
     <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
       <DocumentationFile>bin\Release\TscZebra.Plugin.xml</DocumentationFile>
     </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\..\README.md" Pack="true" PackagePath="README.md"/>
+    </ItemGroup>
     
     <ItemGroup>
         <ProjectReference Include="..\TscZebra.Plugin.Abstractions\TscZebra.Plugin.Abstractions.csproj" />

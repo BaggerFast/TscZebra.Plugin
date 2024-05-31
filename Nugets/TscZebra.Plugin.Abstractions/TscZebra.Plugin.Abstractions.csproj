@@ -1,5 +1,13 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
-  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
-    <DocumentationFile>bin\Release\TscZebra.Plugin.Abstractions.xml</DocumentationFile>
-  </PropertyGroup>
+    <PropertyGroup>
+        <Description>Abstraction package for TscZebra.Plugin nuget</Description>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <None Include="..\..\README.md" Pack="true" PackagePath="README.md"/>
+    </ItemGroup>
+    
+    <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+        <DocumentationFile>bin\Release\TscZebra.Plugin.Abstractions.xml</DocumentationFile>
+    </PropertyGroup>
 </Project>

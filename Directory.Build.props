@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
     <PropertyGroup>
-        <Version>1.0.2</Version>
+        <Version>1.0.3</Version>
         <TargetFramework>net8.0</TargetFramework>
         <Deterministic>true</Deterministic>
         <WarningLevel>9999</WarningLevel>
@@ -12,15 +12,14 @@
     </PropertyGroup>
     
     <PropertyGroup>
-        <Description>C# nuget package for zpl 2 printers (Zebra and TSC)</Description>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
         <PackageProjectUrl>https://vladstandard.github.io/TscZebra.Plugin/</PackageProjectUrl>
         <RepositoryUrl>https://github.com/VladStandard/TscZebra.Plugin</RepositoryUrl>
         <RepositoryType>GitHub</RepositoryType>
-        <PackageTags>Printer;Tsk;Zebra</PackageTags>
+        <PackageTags>Printer;Tsc;Zebra;Zpl;Zpl2;ThermalPrinter;PrintLabels</PackageTags>
     </PropertyGroup>
 
     <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
     </PropertyGroup>
-
 </Project>
