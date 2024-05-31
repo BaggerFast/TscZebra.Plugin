@@ -1,9 +1,11 @@
 ﻿using TscZebra.Plugin.Abstractions.Enums;
 using TscZebra.Plugin.Abstractions.Exceptions;
-using TscZebra.Plugin.Abstractions.Messages;
 
 namespace TscZebra.Plugin.Abstractions.Common;
 
+/// <summary>
+/// Represents a ZPL printer interface.
+/// </summary>
 public interface IZplPrinter : IDisposable
 {
     #region Connect
@@ -28,8 +30,9 @@ public interface IZplPrinter : IDisposable
     /// </summary>
     /// <param name="secs">The interval, in seconds, for polling the printer's status. The default is 30 seconds.</param>
     /// <remarks>
-    /// Subscribes to the <see cref="PrinterStatusMsg"/> event using <c>CommunityToolkit.Mvvm.Messaging</c> to receive status updates.
+    /// Subscribes to the <see cref="PrinterStatusChanged"/> event to receive status updates.
     /// Call <see cref="StopStatusPolling"/> when status monitoring is no longer needed.
+    /// If the printer is initially in a "Disabled" state, polling will automatically stop.
     /// </remarks>
     public void StartStatusPolling(short secs = 30);
 
@@ -40,7 +43,7 @@ public interface IZplPrinter : IDisposable
     /// Stops the periodic status checks initiated by <see cref="StartStatusPolling"/>.
     /// </remarks>
     public void StopStatusPolling();
-
+    
     #endregion
 
     #region Commands
@@ -65,9 +68,18 @@ public interface IZplPrinter : IDisposable
     /// Thrown when there is an error retrieving the printer's status.
     /// </exception>
     /// <remarks>
-    /// Invokes the <see cref="PrinterStatusMsg"/> event using <c>CommunityToolkit.Mvvm.Messaging</c> to receive status updates.
+    /// Invokes the <see cref="PrinterStatusChanged"/> event to receive status updates.
     /// </remarks>
     public Task<PrinterStatuses> RequestStatusAsync();
 
+    #endregion
+    
+    #region Events
+    
+    /// <summary>
+    /// Represents the method that will handle the event raised when the printer status changes.
+    /// </summary>
+    public event EventHandler<PrinterStatuses> PrinterStatusChanged;
+    
     #endregion
 }

@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <Project>
     <PropertyGroup>
+        <Version>1.0.2</Version>
         <TargetFramework>net8.0</TargetFramework>
         <Deterministic>true</Deterministic>
         <WarningLevel>9999</WarningLevel>
@@ -17,5 +18,9 @@
         <RepositoryType>GitHub</RepositoryType>
         <PackageTags>Printer;Tsk;Zebra</PackageTags>
     </PropertyGroup>
-    
+
+    <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+
 </Project>

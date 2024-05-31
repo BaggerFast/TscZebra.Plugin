@@ -1,2 +1,5 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup Condition=" '$(Configuration)' == 'Release' ">
+    <DocumentationFile>bin\Release\TscZebra.Plugin.Abstractions.xml</DocumentationFile>
+  </PropertyGroup>
 </Project>
