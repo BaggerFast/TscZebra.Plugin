@@ -34,7 +34,7 @@ public interface IZplPrinter : IDisposable
     /// Call <see cref="StopStatusPolling"/> when status monitoring is no longer needed.
     /// If the printer is initially in a "Disabled" state, polling will automatically stop.
     /// </remarks>
-    public void StartStatusPolling(short secs = 30);
+    public void StartStatusPolling(ushort secs = 30);
 
     /// <summary>
     /// Stops polling the printer's status.

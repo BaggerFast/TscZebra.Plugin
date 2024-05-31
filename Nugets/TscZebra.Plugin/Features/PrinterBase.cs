@@ -49,8 +49,11 @@ internal abstract partial class PrinterBase(IPAddress ip, int port) : IZplPrinte
 
     #region StatusPolling
 
-    public void StartStatusPolling(short secs = 30)
+    public void StartStatusPolling(ushort secs = 30)
     {
+        if (secs < 3)
+            throw new ArgumentOutOfRangeException(nameof(secs), "The polling interval must be at least 5 seconds.");
+        
         TimeSpan interval = TimeSpan.FromSeconds(secs);
 
         StatusTimer = new(Callback, null, TimeSpan.Zero, interval);
@@ -83,8 +86,11 @@ internal abstract partial class PrinterBase(IPAddress ip, int port) : IZplPrinte
     #endregion
 
     #region Commands
+    
     public async Task PrintZplAsync(string zpl)
     {
+        await RequestStatusAsync();
+        
         if (!new IsPrinterPrintReady().Validate(Status))
             throw new PrinterStatusException();
         

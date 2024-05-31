@@ -7,14 +7,26 @@ export default defineConfig({
   themeConfig: {
     nav: [
       { text: 'Home', link: '/' },
-      { text: 'Examples', link: '/markdown-examples' }
+      { text: 'Guide', link: '/guide/' }
     ],
     sidebar: [
       {
+        text: 'About',
+        items: [
+          { text: 'About', link: '/guide/about.md' },
+        ]
+      },
+      {
+        text: 'Documentation',
+        items: [
+          { text: 'Installation', link: '/guide/index.md' },
+          { text: 'How to use', link: '/guide/usage.md' }
+        ]
+      },
+      {
         text: 'Examples',
         items: [
-          { text: 'Markdown Examples', link: '/markdown-examples' },
-          { text: 'Runtime API Examples', link: '/api-examples' }
+          { text: 'Blazor server', link: '/guide/blazor-server-example.md' },
         ]
       }
     ],
