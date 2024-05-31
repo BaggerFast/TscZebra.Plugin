@@ -1,13 +1,4 @@
-# TscZebra.Plugin
-
-This NuGet package simplifies printer connectivity via TCP connection, enabling querying of
-printer status and sending print commands 🖨️
-
-It exclusively supports ZPL labels for thermal printers 🔥
-
-## Support manufactures
-- [TSC](https://emea.tscprinters.com/)
-- [Zebra](https://www.zebra.com/)
+﻿#  Usage
 
 ## Setup printer
 This code creates IZplPrinter Instance without connecting
@@ -97,7 +88,7 @@ If the printer is successfully connected but cannot print a label (e.g., the hea
 ```csharp
 Printer.Disconnect();
 ```
-or
+or 
 ```csharp
 Printer.Dispose();
 ```

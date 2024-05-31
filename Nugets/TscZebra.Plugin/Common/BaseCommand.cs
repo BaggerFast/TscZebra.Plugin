@@ -3,7 +3,7 @@ using System.Text;
 
 namespace TscZebra.Plugin.Common;
 
-public abstract class BaseCommand<T> (string command)
+internal abstract class BaseCommand<T> (string command)
 {
     public async Task<T> RequestAsync(NetworkStream stream)
     {

@@ -1,28 +1,14 @@
-﻿using System;
-using System.IO;
-using System.Net;
-using System.Net.Sockets;
+﻿using System.Net;
 using System.Text;
-using System.Threading;
-using System.Threading.Tasks;
-using CommunityToolkit.Mvvm.Messaging;
 using TscZebra.Plugin.Abstractions.Common;
 using TscZebra.Plugin.Abstractions.Enums;
 using TscZebra.Plugin.Abstractions.Exceptions;
-using TscZebra.Plugin.Abstractions.Messages;
-using TscZebra.Plugin.Common;
 using TscZebra.Plugin.Validators.State;
 
 namespace TscZebra.Plugin.Features;
 
-internal abstract class PrinterBase(IPAddress ip, int port) : IZplPrinter
+internal abstract partial class PrinterBase(IPAddress ip, int port) : IZplPrinter
 {
-    private Timer? StatusTimer { get; set; }
-    protected TcpClient TcpClient { get; private set; } = new();
-    protected PrinterStatuses Status { get; set; } = PrinterStatuses.IsDisconnected;
-
-    #region Public
-    
     #region Connect
 
     public async Task ConnectAsync()
@@ -63,8 +49,11 @@ internal abstract class PrinterBase(IPAddress ip, int port) : IZplPrinter
 
     #region StatusPolling
 
-    public void StartStatusPolling(short secs = 30)
+    public void StartStatusPolling(ushort secs = 30)
     {
+        if (secs < 3)
+            throw new ArgumentOutOfRangeException(nameof(secs), "The polling interval must be at least 5 seconds.");
+        
         TimeSpan interval = TimeSpan.FromSeconds(secs);
 
         StatusTimer = new(Callback, null, TimeSpan.Zero, interval);
@@ -97,11 +86,11 @@ internal abstract class PrinterBase(IPAddress ip, int port) : IZplPrinter
     #endregion
 
     #region Commands
-
-    public abstract Task<PrinterStatuses> RequestStatusAsync();
     
     public async Task PrintZplAsync(string zpl)
     {
+        await RequestStatusAsync();
+        
         if (!new IsPrinterPrintReady().Validate(Status))
             throw new PrinterStatusException();
         
@@ -121,35 +110,5 @@ internal abstract class PrinterBase(IPAddress ip, int port) : IZplPrinter
         }
     }
 
-    #endregion
-    
-    public void Dispose() => Disconnect();
-
-    #endregion
-
-    #region Private
-
-    protected void SetStatus(PrinterStatuses state)
-    {
-        Status = state;
-        WeakReferenceMessenger.Default.Send(new PrinterStatusMsg(Status));
-    }
-    
-    protected async Task<T> ExecuteCommand<T>(BaseCommand<T> command, BaseValidator<PrinterStatuses> stateValidator)
-    {
-        if (!stateValidator.Validate(Status))
-            throw new PrinterStatusException();
-        try
-        {
-            return await command.RequestAsync(TcpClient.GetStream());
-        }
-        catch (Exception)
-        {
-            Disconnect();
-            throw new PrinterConnectionException();
-        }
-    }
-
-    
     #endregion
 }

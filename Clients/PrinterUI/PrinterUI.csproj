@@ -1,13 +1,6 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   
   <ItemGroup>
-    <Content Remove="package.json" />
-    <None Include="package.json" />
-    <Content Remove="package-lock.json" />
-    <None Include="package-lock.json" />
-  </ItemGroup>
-
-  <ItemGroup>
     <PackageReference Include="Microsoft.FluentUI.AspNetCore.Components" Version="4.7.2" />
   </ItemGroup>
 

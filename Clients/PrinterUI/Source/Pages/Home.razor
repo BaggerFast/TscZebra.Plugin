@@ -1,13 +1,10 @@
 ﻿@page "/"
+
 @using System.Net
-@using CommunityToolkit.Mvvm.Messaging
 @using TscZebra.Plugin
 @using TscZebra.Plugin.Abstractions.Common
 @using TscZebra.Plugin.Abstractions.Enums
 @using TscZebra.Plugin.Abstractions.Exceptions
-@using TscZebra.Plugin.Abstractions.Messages
-
-@implements CommunityToolkit.Mvvm.Messaging.IRecipient<PrinterStatusMsg>
 @implements IDisposable
 
 <div class="w-full flex gap-2 pt-2 items-center justify-center">
@@ -38,8 +35,8 @@
 
   protected override void OnAfterRender(bool firstRender)
   {
-    if (firstRender) WeakReferenceMessenger.Default.Register(this);
-    base.OnAfterRender(firstRender);
+    if (firstRender) Printer.PrinterStatusChanged += Receive;
+    base.OnAfterRender(firstRender); 
   }
 
   private async Task Connect()
@@ -72,15 +69,15 @@
 
   }
 
-  public void Receive(PrinterStatusMsg message)
+  private void Receive(object? sender, PrinterStatuses statuses)
   {
-      Status = message.Status;
+      Status = statuses;
       InvokeAsync(StateHasChanged);
   }
 
   public void Dispose()
   {
     Printer.Dispose();
-    WeakReferenceMessenger.Default.Unregister<PrinterStatusMsg>(this);
+    Printer.PrinterStatusChanged += Receive;
   }
 }

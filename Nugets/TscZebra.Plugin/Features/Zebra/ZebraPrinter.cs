@@ -1,5 +1,4 @@
 ﻿using System.Net;
-using System.Threading.Tasks;
 using TscZebra.Plugin.Abstractions.Enums;
 using TscZebra.Plugin.Features.Zebra.Commands.Status;
 using TscZebra.Plugin.Validators.State;
