@@ -12,10 +12,13 @@
     </PropertyGroup>
     
     <PropertyGroup>
-        <PackageReadmeFile>README.md</PackageReadmeFile>
-        <PackageProjectUrl>https://vladstandard.github.io/TscZebra.Plugin/</PackageProjectUrl>
-        <RepositoryUrl>https://github.com/VladStandard/TscZebra.Plugin</RepositoryUrl>
         <RepositoryType>GitHub</RepositoryType>
+        <PackageReadmeFile>README.md</PackageReadmeFile>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        
+        <PackageProjectUrl>https://github.com/BaggerFast/TscZebra.Plugin</PackageProjectUrl>
+        <RepositoryUrl>https://baggerfast.github.io/TscZebra.Plugin/</RepositoryUrl>
+        
         <PackageTags>Printer;Tsc;Zebra;Zpl;Zpl2;ThermalPrinter;PrintLabels</PackageTags>
     </PropertyGroup>
 

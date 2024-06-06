@@ -1,7 +1,7 @@
 ﻿using TscZebra.Plugin.Abstractions.Enums;
 using TscZebra.Plugin.Abstractions.Exceptions;
 
-namespace TscZebra.Plugin.Abstractions.Common;
+namespace TscZebra.Plugin.Abstractions;
 
 /// <summary>
 /// Represents a ZPL printer interface.
@@ -28,13 +28,13 @@ public interface IZplPrinter : IDisposable
     /// <summary>
     /// Starts polling the printer's status at regular intervals.
     /// </summary>
-    /// <param name="secs">The interval, in seconds, for polling the printer's status. The default is 30 seconds.</param>
+    /// <param name="secs">The interval, in seconds, for polling the printer's status. The default is 5 seconds.</param>
     /// <remarks>
-    /// Subscribes to the <see cref="PrinterStatusChanged"/> event to receive status updates.
+    /// Subscribes to the <see cref="OnStatusChanged"/> event to receive status updates.
     /// Call <see cref="StopStatusPolling"/> when status monitoring is no longer needed.
     /// If the printer is initially in a "Disabled" state, polling will automatically stop.
     /// </remarks>
-    public void StartStatusPolling(ushort secs = 30);
+    public void StartStatusPolling(ushort secs = 5);
 
     /// <summary>
     /// Stops polling the printer's status.
@@ -62,24 +62,24 @@ public interface IZplPrinter : IDisposable
     /// Asynchronously requests the current status of the printer.
     /// </summary>
     /// <returns>
-    /// A task with the printer's current status as a <see cref="PrinterStatuses"/>.
+    /// A task with the printer's current status as a <see cref="PrinterStatus"/>.
     /// </returns>
     /// <exception cref="PrinterConnectionException">
     /// Thrown when there is an error retrieving the printer's status.
     /// </exception>
     /// <remarks>
-    /// Invokes the <see cref="PrinterStatusChanged"/> event to receive status updates.
+    /// Invokes the <see cref="OnStatusChanged"/> event to receive status updates.
     /// </remarks>
-    public Task<PrinterStatuses> RequestStatusAsync();
+    public Task<PrinterStatus> RequestStatusAsync();
 
     #endregion
     
     #region Events
     
     /// <summary>
-    /// Represents the method that will handle the event raised when the printer status changes.
+    /// Subscribe to this event to receive notifications about the status of the Printer.
     /// </summary>
-    public event EventHandler<PrinterStatuses> PrinterStatusChanged;
+    public event EventHandler<PrinterStatus> OnStatusChanged;
     
     #endregion
 }

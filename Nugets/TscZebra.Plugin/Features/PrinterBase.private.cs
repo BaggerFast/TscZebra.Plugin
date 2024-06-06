@@ -9,25 +9,26 @@ internal abstract partial class PrinterBase
 {
     private Timer? StatusTimer { get; set; }
     private TcpClient TcpClient { get; set; } = new();
-    protected PrinterStatuses Status { get; set; } = PrinterStatuses.IsDisconnected;
-    
-    public abstract Task<PrinterStatuses> RequestStatusAsync();
-    
-    public event EventHandler<PrinterStatuses>? PrinterStatusChanged;
-    
-    protected void SetStatus(PrinterStatuses state)
+    private PrinterStatus Status { get; set; } = PrinterStatus.Disconnected;
+
+    private void SetStatus(PrinterStatus status)
     {
-        Status = state;
-        PrinterStatusChanged?.Invoke(this, Status);
+        if (status == Status) return;
+        Status = status;
+        OnStatusChanged?.Invoke(this, Status);
     }
-    
-    protected async Task<T> ExecuteCommand<T>(BaseCommand<T> command, BaseValidator<PrinterStatuses> stateValidator)
+
+    private async Task<T> ExecuteCommand<T>(Command<T> command)
     {
-        if (!stateValidator.Validate(Status))
-            throw new PrinterStatusException();
+        if (TcpClient.Connected == false)
+            throw new PrinterConnectionException();
+        
         try
         {
-            return await command.RequestAsync(TcpClient.GetStream());
+            using CancellationTokenSource cancellationTokenSource = new(TimeSpan.FromMilliseconds(1000));
+            CancellationToken cancellationToken = cancellationTokenSource.Token;
+            
+            return await command.RequestAsync(TcpClient.GetStream(), cancellationToken);
         }
         catch (Exception)
         {
@@ -35,6 +36,6 @@ internal abstract partial class PrinterBase
             throw new PrinterConnectionException();
         }
     }
-
-    public void Dispose() => Disconnect();
+    
+    protected abstract Command<PrinterStatus> GetStatusCommand { get; }
 }

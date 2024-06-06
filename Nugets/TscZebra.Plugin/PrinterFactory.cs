@@ -1,5 +1,5 @@
 ﻿using System.Net;
-using TscZebra.Plugin.Abstractions.Common;
+using TscZebra.Plugin.Abstractions;
 using TscZebra.Plugin.Abstractions.Enums;
 using TscZebra.Plugin.Features.Tsc;
 using TscZebra.Plugin.Features.Zebra;

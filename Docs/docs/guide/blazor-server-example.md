@@ -1,15 +1,19 @@
 ﻿# Examples
-To see how the library works, you can run the blazor application from the official [repository](https://github.com/VladStandard/TscZebra.Plugin/tree/main/Clients/PrinterUI)
+To see how the library works, you can run the blazor application from the official [repository](https://github.com/BaggerFast/TscZebra.Plugin/tree/main/Clients/PrinterUI)
 
 ```csharp
 @page "/"
+
 @using System.Net
 @using TscZebra.Plugin
 @using TscZebra.Plugin.Abstractions
 @using TscZebra.Plugin.Abstractions.Enums
 @using TscZebra.Plugin.Abstractions.Exceptions
-
 @implements IDisposable
+
+<div class="w-full pt-4 flex flex-col items-center justify-center">
+  <p class="text-5xl">TscZebra.WebUI</p>
+</div>
 
 <div class="w-full flex gap-2 pt-2 items-center justify-center">
   <Button OnClick="@Connect">
@@ -21,7 +25,7 @@ To see how the library works, you can run the blazor application from the offici
   <Button OnClick="@GetStatus">
     GetStatusByHand
   </Button>
-  <Button>
+  <Button OnClick="@Print">
     Print
   </Button>
 </div>
@@ -31,54 +35,70 @@ To see how the library works, you can run the blazor application from the offici
 </div>
 
 
+
 @code {
-    IZplPrinter Printer { get; set; } = 
-        PrinterFactory.Create(IPAddress.Parse("10.0.22.71"), 9100, PrinterTypes.Tsc);
-    PrinterStatuses Status { get; set; }= PrinterStatuses.IsDisconnected;
-    PrinterStatuses StatusByHand { get; set; }= PrinterStatuses.IsDisconnected;
-    
-    protected override void OnAfterRender(bool firstRender)
+  IZplPrinter Printer { get; set; } = PrinterFactory.Create(IPAddress.Parse("10.0.22.71"), 9100, PrinterTypes.Tsc);
+  PrinterStatus Status { get; set; }= PrinterStatus.Disconnected;
+  PrinterStatus StatusByHand { get; set; }= PrinterStatus.Disconnected;
+  static string Zpl => "^XA\n^FO 0,10\n^GB632,0,2^FS\n^FO0,25\n^FB632,1,0,C,0\n^ASN,70,70\n^FDWAR INC.^FS\n^FO0," +
+                       "100\n^GB632,0,2^FS\n^FO0,120\n^FB632,1,0,C,0\n^ASN,60,60\n^FDGoose^FS\n^FO0,180\n^FB632,1," +
+                       "0,C,0\n^ASN,60,60\n^FDWild^FS\n^FO0,240\n^GB632,0,2^FS\n^FO120,260\n^BY2\n^BCN,70,N,N,N\n^" +
+                       "FDSECRECTCODE^FS - \n^XZ";
+  
+  protected override void OnAfterRender(bool firstRender)
+  {
+    if (firstRender)
+      Printer.OnStatusChanged += ReceiveOnStatus;
+    base.OnAfterRender(firstRender);
+  }
+  
+  private async Task Connect()
+  {
+    try
     {
-        if (firstRender) Printer.PrinterStatusChanged += Receive;
-        base.OnAfterRender(firstRender);
-    }
-    
-    private async Task Connect()
+      await Printer.ConnectAsync();
+      Printer.StartStatusPolling();
+    } catch (PrinterConnectionException)
     {
-        try
-        {
-        await Printer.ConnectAsync();
-        Printer.StartStatusPolling(5);
-        } catch (PrinterConnectionException) {
-            
-        } 
-    }
-    
-    private void Disconnect()
+      
+    } 
+  }
+
+  private void Disconnect() => Printer.Disconnect();
+  
+  private async Task GetStatus()
+  {
+    try
     {
-        Printer.Disconnect();
-    }
-    
-    private async Task GetStatus()
+      StatusByHand = await Printer.RequestStatusAsync();
+    } catch (PrinterConnectionException)
     {
-        try
-        {
-            StatusByHand = await Printer.RequestStatusAsync();
-        } catch (PrinterConnectionException) {
-            
-        } 
-    }
-    
-    private void Receive(object? sender, PrinterStatuses statuses)
+      
+    } 
+
+  }
+  
+  private async Task Print()
+  {
+    try
     {
-        Status = statuses;
-        InvokeAsync(StateHasChanged);
-    }
-    
-    public void Dispose()
+      await Printer.PrintZplAsync(Zpl);
+    } catch (Exception e)
     {
-        Printer.Dispose();
-        Printer.PrinterStatusChanged += Receive;
-    }
+      
+    } 
+  }
+
+  private void ReceiveOnStatus(object? sender, PrinterStatus status)
+  {
+      Status = status;
+      InvokeAsync(StateHasChanged);
+  }
+
+  public void Dispose()
+  {
+    Printer.Dispose();
+    Printer.OnStatusChanged -= ReceiveOnStatus;
+  }
 }
 ```

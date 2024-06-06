@@ -18,7 +18,7 @@ hero:
       link:  /guide/
     - theme: alt
       text: Nuget.org
-      link: https://www.nuget.org/packages?q=%09TscZebra.Plugin
+      link: https://www.nuget.org/packages?q=TscZebra.Plugin
 
 features:
   - icon: 💡
