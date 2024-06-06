@@ -1,55 +1,54 @@
 ﻿using System.Net;
-using System.Text;
-using TscZebra.Plugin.Abstractions.Common;
+using TscZebra.Plugin.Abstractions;
 using TscZebra.Plugin.Abstractions.Enums;
 using TscZebra.Plugin.Abstractions.Exceptions;
-using TscZebra.Plugin.Validators.State;
+using TscZebra.Plugin.Common;
+using TscZebra.Plugin.Misc;
+using TscZebra.Plugin.Shared.Commands;
 
 namespace TscZebra.Plugin.Features;
 
 internal abstract partial class PrinterBase(IPAddress ip, int port) : IZplPrinter
 {
+    public event EventHandler<PrinterStatus>? OnStatusChanged;
+    
     #region Connect
-
+    
     public async Task ConnectAsync()
     {
         try
         {
             Disconnect();
-            TcpClient = new() { ReceiveTimeout = 200 };
 
-            Task connectTask = TcpClient.ConnectAsync(ip, port);
-            Task timeoutTask = Task.Delay(200);
-
-            if (await Task.WhenAny(connectTask, timeoutTask) == timeoutTask)
-            {
-                connectTask.Dispose();
-                throw new PrinterConnectionException();
-            }
+            using CancellationTokenSource cancellationTokenSource = new(TimeSpan.FromMilliseconds(500));
+            CancellationToken cancellationToken = cancellationTokenSource.Token;
             
-            await connectTask;
-            Status = PrinterStatuses.Ready;
-            await RequestStatusAsync();
+            TcpClient = new() { ReceiveTimeout = 500, SendTimeout = 500 };
+            await TcpClient.ConnectAsync(ip, port, cancellationToken);
+
+            SetStatus(PrinterStatus.Ready);
         }
-        catch
+        catch (Exception)
         {
-            Disconnect();
             throw new PrinterConnectionException();
         }
     }
 
     public void Disconnect()
     {
-        TcpClient.Dispose();
+        SetStatus(PrinterStatus.Disconnected);
         StopStatusPolling();
-        SetStatus(PrinterStatuses.IsDisconnected);
+        
+        TcpClient.Dispose();
     }
+    
+    public void Dispose() => Disconnect();
     
     #endregion
 
     #region StatusPolling
 
-    public void StartStatusPolling(ushort secs = 30)
+    public void StartStatusPolling(ushort secs = 5)
     {
         if (secs < 3)
             throw new ArgumentOutOfRangeException(nameof(secs), "The polling interval must be at least 5 seconds.");
@@ -63,12 +62,10 @@ internal abstract partial class PrinterBase(IPAddress ip, int port) : IZplPrinte
         {
             try
             {
-                if (Status == PrinterStatuses.IsDisconnected)
-                {
+                if (Status is PrinterStatus.Disconnected)
                     StopStatusPolling();
-                    return;
-                }
-                await RequestStatusAsync();
+                else
+                    await RequestStatusAsync();
             }
             catch
             {
@@ -88,26 +85,24 @@ internal abstract partial class PrinterBase(IPAddress ip, int port) : IZplPrinte
     #region Commands
     
     public async Task PrintZplAsync(string zpl)
-    {
+    { 
         await RequestStatusAsync();
         
-        if (!new IsPrinterPrintReady().Validate(Status))
+        if (Status is not (PrinterStatus.Ready or PrinterStatus.Busy))
             throw new PrinterStatusException();
         
-        if (!zpl.StartsWith("^XA") || !zpl.EndsWith("^XZ"))
-            throw new PrinterCommandBodyException();
+        Command<VoidType> printCmd = new PrintCommand(zpl); 
+        await ExecuteCommand(printCmd);
+    }
 
-        try
-        {    
-            Stream stream = TcpClient.GetStream();
-            byte[] commandBytes = Encoding.UTF8.GetBytes(zpl);
-            await stream.WriteAsync(commandBytes);
-        }
-        catch
-        {
-            Disconnect();
-            throw new PrinterConnectionException();
-        }
+    public async Task<PrinterStatus> RequestStatusAsync()
+    {
+        if (Status is PrinterStatus.Disconnected)
+            return Status;
+        
+        PrinterStatus stat = await ExecuteCommand(GetStatusCommand);
+        SetStatus(stat);
+        return Status;
     }
 
     #endregion

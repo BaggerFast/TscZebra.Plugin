@@ -1,3 +1,3 @@
 ﻿namespace TscZebra.Plugin.Abstractions.Exceptions;
 
-public class PrinterConnectionException : Exception;
+public sealed class PrinterConnectionException : Exception;

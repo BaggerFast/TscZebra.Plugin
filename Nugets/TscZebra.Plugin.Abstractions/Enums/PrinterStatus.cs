@@ -3,7 +3,7 @@
 /// <summary>
 /// Represents the possible statuses of a printer.
 /// </summary>
-public enum PrinterStatuses
+public enum PrinterStatus
 {
     /// <summary>
     /// The printer has unsupported status by developer.
@@ -48,5 +48,5 @@ public enum PrinterStatuses
     /// <summary>
     /// The printer is disconnected.
     /// </summary>
-    IsDisconnected,
+    Disconnected,
 }

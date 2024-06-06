@@ -31,7 +31,7 @@ export default defineConfig({
       }
     ],
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/VladStandard/TscZebra.Plugin' }
+      { icon: 'github', link: 'https://github.com/BaggerFast/TscZebra.Plugin' }
     ]
   }
 })
